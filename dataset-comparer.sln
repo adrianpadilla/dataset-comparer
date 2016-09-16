@@ -5,6 +5,10 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dataset-comparer-engine", "src\dataset-comparer-engine\dataset-comparer-engine.csproj", "{2164C4AE-1513-4D77-8E2D-8EC6645A4772}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dataset-comparer-engine.tests", "dataset-comparer-engine.tests\dataset-comparer-engine.tests.csproj", "{DA671670-76FF-4A54-BFDD-1B4A9A739E4B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dataset-converters", "dataset-converters\dataset-converters.csproj", "{4403E05A-5D49-4D31-B686-7FC0A1D305BC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{2164C4AE-1513-4D77-8E2D-8EC6645A4772}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2164C4AE-1513-4D77-8E2D-8EC6645A4772}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2164C4AE-1513-4D77-8E2D-8EC6645A4772}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA671670-76FF-4A54-BFDD-1B4A9A739E4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA671670-76FF-4A54-BFDD-1B4A9A739E4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA671670-76FF-4A54-BFDD-1B4A9A739E4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA671670-76FF-4A54-BFDD-1B4A9A739E4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4403E05A-5D49-4D31-B686-7FC0A1D305BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4403E05A-5D49-4D31-B686-7FC0A1D305BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4403E05A-5D49-4D31-B686-7FC0A1D305BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4403E05A-5D49-4D31-B686-7FC0A1D305BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
