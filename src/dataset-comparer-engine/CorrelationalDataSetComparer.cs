@@ -180,6 +180,7 @@ namespace GrumpyDev.Net.DataTools.DataSetComparer
             //return ResultDataTable;
         }
 
+        [Obsolete]
         public DataTable GetTableDifferences(DataTable firstTable, DataTable secondTable)
         {
 
