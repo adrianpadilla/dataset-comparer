@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace dataset_converters
+namespace GrumpyDev.Net.DataTools.Converters
 {
     public static class CsvToDataSetConverter
     {
