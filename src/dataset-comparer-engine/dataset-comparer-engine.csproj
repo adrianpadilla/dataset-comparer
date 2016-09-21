@@ -43,6 +43,13 @@
     <Compile Include="CorrelationalDataSetComparer.cs" />
     <Compile Include="IDataSetComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StateValues.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\datachangetracking\datachangetracking.csproj">
+      <Project>{3abe5558-dec9-48bf-bdf8-b4d44aaaee3e}</Project>
+      <Name>datachangetracking</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

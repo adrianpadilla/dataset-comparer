@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data;
+using System.Reflection;
+using dataset_comparer_engine;
+using GrumpyDev.Net.DataTools.ChangeTracking;
 
 
 namespace GrumpyDev.Net.DataTools.DataSetComparer
@@ -25,20 +28,9 @@ namespace GrumpyDev.Net.DataTools.DataSetComparer
         }
 
         //TODO: Use the column objects
-        public DataTable GetTableDifferences(DataTable firstTable, DataTable secondTable, string[] ignoredColummsNames, string[] orderColumnNames, string dataWork1Name = "Data in first", string dataWork2Name = "Data in second")
+        public DataTable GetTableDifferences(DataTable firstTable, DataTable secondTable, string[] ignoredColummsNames, string[] orderColumnNames)
         {
-            //Handles table names
-
-            if (string.IsNullOrWhiteSpace(dataWork1Name))
-            {
-                dataWork1Name = "Data in first";
-            }
-
-            if (string.IsNullOrWhiteSpace(dataWork2Name))
-            {
-                dataWork2Name = "Data in second";
-            }
-
+            
             string diffTableName;
             if (firstTable.TableName.ToUpperInvariant().Equals(secondTable.TableName.ToUpperInvariant()))
             {
@@ -145,7 +137,7 @@ namespace GrumpyDev.Net.DataTools.DataSetComparer
                         //parentrow["Comparison_Result"] = "Found on table 1 but not in 2";
                         List<object> cols = new List<object>();
                         cols.AddRange(parentrow.ItemArray);
-                        cols.Add(dataWork1Name);
+                        cols.Add(StateValues.ElementInBaselineTable);
                         ResultDataTable.LoadDataRow(cols.ToArray<object>(), true);
                     }
                 }
@@ -159,7 +151,7 @@ namespace GrumpyDev.Net.DataTools.DataSetComparer
                         //parentrow["Comparison_Result"] = "Found on table 2 but not in 1";
                         List<object> cols = new List<object>();
                         cols.AddRange(parentrow.ItemArray);
-                        cols.Add(dataWork2Name);
+                        cols.Add(StateValues.ElementInChangedTable);
                         ResultDataTable.LoadDataRow(cols.ToArray<object>(), true);
                         //ResultDataTable.LoadDataRow(parentrow.ItemArray, true);
                     }
@@ -269,6 +261,90 @@ namespace GrumpyDev.Net.DataTools.DataSetComparer
             return ResultDataTable;
         }
 
+        public static TEntity GetEntity<TEntity>(DataRow baseline, DataRow changed) where TEntity : new()
+        {
+            var newEntity =new TEntity();
+            
+
+            for (int i = 0; i < baseline.Table.Columns.Count; i++)
+            {
+                var columnName = baseline.Table.Columns[i].ColumnName.TrimEnd('\n').TrimEnd('\r');
+
+                if (columnName == "Comparison_Result")
+                {
+                    continue;
+                }
+
+                var baseLineValue = baseline[i].ToString();
+                var changedValue = changed[i].ToString();
+
+                var propertyInfo = newEntity.GetType().GetProperty(columnName);
+
+                var attributes = propertyInfo.GetCustomAttributes(typeof(TrackedFieldAttribute), false) as TrackedFieldAttribute[];
+
+                var attribute =  attributes.Length > 0 ? attributes[0] : null;
+
+
+                if (baseLineValue != changedValue)
+                {
+                    propertyInfo.SetValue(newEntity, Convert.ChangeType(changedValue, propertyInfo.PropertyType), null);
+                    var changeTrackingInfo = attribute.TrackedFieldInfo;
+
+                    changeTrackingInfo.State = FieldChangeState.Modified;
+                    changeTrackingInfo.OldValue = baseLineValue;
+                }
+                else
+                {
+                    propertyInfo.SetValue(newEntity, Convert.ChangeType(baseLineValue, propertyInfo.PropertyType), null);
+                }
+                
+            }
+
+            return newEntity;
+
+
+        }
+
+        public IEnumerable<TEntity> GetTaggedEntities<TEntity>(DataTable differences, string[] identifierColumns, string[] ignoredColumns) where TEntity : new()
+        {
+            var list = new List<TEntity>();
+
+            //Sort
+            DataView view = differences.AsDataView();
+            StringBuilder sortbuilder = new StringBuilder();
+            foreach (var item in identifierColumns)
+            {
+                sortbuilder.Append(item);
+                sortbuilder.Append(",");
+            }
+            view.Sort = sortbuilder.ToString().TrimEnd(',');
+            differences = view.ToTable();
+
+            // Ignored
+            List<int> ignoredColumnIndexList = new List<int>();
+            foreach (var item in ignoredColumns)
+            {
+                ignoredColumnIndexList.Add(differences.Columns.IndexOf(item));
+            }
+            int[] ignoredColumnIndices = ignoredColumnIndexList.ToArray<int>();
+
+
+            // 
+            for (int rowIndx = 0; rowIndx < differences.Rows.Count; rowIndx++)
+            {
+                bool belowIsSame = (rowIndx < differences.Rows.Count - 1 && AreDataRowsTheSameEntity(differences.Rows[rowIndx], differences.Rows[rowIndx + 1], identifierColumns));
+
+                if (belowIsSame)
+                {
+                    var changedEntity = GetEntity<TEntity>(differences.Rows[rowIndx], differences.Rows[rowIndx + 1]);
+                    changedEntity.GetTrackedEntityInfo().State = EntityChangeState.Modified;
+                    list.Add(changedEntity);
+                }   
+            }
+
+            return null;
+        }
+
         public string GetDifferencesHtmlTable(DataTable differences, string[] identifierColumns, string[] ignoredColumns)
         {
             StringBuilder sb = new StringBuilder();
@@ -347,7 +423,7 @@ namespace GrumpyDev.Net.DataTools.DataSetComparer
             return sb.ToString();
         }
 
-        private bool AreDataRowsTheSameEntity(DataRow row1, DataRow row2, string[] identifierColumns)
+        private static bool AreDataRowsTheSameEntity(DataRow row1, DataRow row2, string[] identifierColumns)
         {
 
             foreach (var item in identifierColumns)

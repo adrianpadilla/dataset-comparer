@@ -9,5 +9,10 @@ namespace GrumpyDev.Net.DataTools.ChangeTracking
     public class TrackedEntityInfo
     {
         public EntityChangeState State { get; set; }
+
+        public TrackedEntityInfo()
+        {
+            this.State = EntityChangeState.Unmodified;
+        }
     }
 }

@@ -10,5 +10,10 @@ namespace GrumpyDev.Net.DataTools.ChangeTracking
     {
         public object OldValue { get; set; }
         public FieldChangeState State { get; set; }
+
+        public TrackedFieldInfo()
+        {
+            this.State = FieldChangeState.Unmodified;
+        }
     }
 }
