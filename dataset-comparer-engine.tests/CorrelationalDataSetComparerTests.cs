@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GrumpyDev.Net.DataTools.DataSetComparer;
 using System.IO;
-using dataset_converters;
+using GrumpyDev.Net.DataTools.Converters;
 
 namespace dataset_comparer_engine.tests
 {

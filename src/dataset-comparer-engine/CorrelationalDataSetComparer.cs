@@ -18,7 +18,7 @@ namespace GrumpyDev.Net.DataTools.DataSetComparer
                 if (secondDataSet.Tables.Contains(firstTable.TableName))
                 {
                     var secondTable = secondDataSet.Tables[firstTable.TableName];
-                    differences.Tables.Add(GetTableDifferences(firstTable, secondTable));
+                    differences.Tables.Add(GetTableDifferences(firstTable, secondTable, new string[0], new string[0]));
                 }
             }
             return differences;
