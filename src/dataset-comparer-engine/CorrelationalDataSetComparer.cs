@@ -282,16 +282,26 @@ namespace GrumpyDev.Net.DataTools.DataSetComparer
 
                 var attributes = propertyInfo.GetCustomAttributes(typeof(TrackedFieldAttribute), false) as TrackedFieldAttribute[];
 
-                var attribute =  attributes.Length > 0 ? attributes[0] : null;
+                //var attribute =  attributes.Length > 0 ? attributes[0] : null;
 
 
                 if (baseLineValue != changedValue)
                 {
                     propertyInfo.SetValue(newEntity, Convert.ChangeType(changedValue, propertyInfo.PropertyType), null);
-                    var changeTrackingInfo = attribute.TrackedFieldInfo;
 
-                    changeTrackingInfo.State = FieldChangeState.Modified;
-                    changeTrackingInfo.OldValue = baseLineValue;
+                    //TrackedFieldAttribute attribute = Attribute.GetCustomAttribute(propertyInfo, typeof(TrackedFieldAttribute)) as TrackedFieldAttribute;
+                    
+                    //var changeTrackingInfo = new TrackedFieldInfo
+                    //{
+                    //    State = FieldChangeState.Modified,
+                    //    OldValue = baseLineValue
+                    //};
+
+                    //attribute.TrackedFieldInfo = changeTrackingInfo;
+                    var trackingInfo = newEntity.GetTrackedFieldInfo(columnName);
+                    trackingInfo.State = FieldChangeState.Modified;
+                    trackingInfo.OldValue = baseLineValue;
+
                 }
                 else
                 {
@@ -342,7 +352,7 @@ namespace GrumpyDev.Net.DataTools.DataSetComparer
                 }   
             }
 
-            return null;
+            return list.AsEnumerable();
         }
 
         public string GetDifferencesHtmlTable(DataTable differences, string[] identifierColumns, string[] ignoredColumns)
