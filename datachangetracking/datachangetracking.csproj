@@ -41,13 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChangeTrackingExtensions.cs" />
-    <Compile Include="EntityChangeState.cs" />
-    <Compile Include="FieldChangeState.cs" />
-    <Compile Include="TrackedEntityAttribute.cs" />
+    <Compile Include="ChangeState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TrackedEntityInfo.cs" />
-    <Compile Include="TrackedFieldAttribute.cs" />
-    <Compile Include="TrackedFieldInfo.cs" />
+    <Compile Include="ChangeTrackingInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

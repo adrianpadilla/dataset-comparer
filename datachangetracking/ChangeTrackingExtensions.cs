@@ -12,13 +12,13 @@ namespace GrumpyDev.Net.DataTools.ChangeTracking
 {
     public static class ChangeTrackingExtensions
     {
-        static IDictionary<object, IDictionary<string, TrackedFieldInfo>> TrackedPropertyDictionary { get; set; }
+        static IDictionary<object, IDictionary<string, ChangeTrackingInfo>> TrackedPropertyDictionary { get; set; }
 
         static ChangeTrackingExtensions()
         {
-            TrackedPropertyDictionary = new Dictionary<object, IDictionary<string, TrackedFieldInfo>>();
+            TrackedPropertyDictionary = new Dictionary<object, IDictionary<string, ChangeTrackingInfo>>();
         }
-        public static TrackedFieldInfo GetTrackedFieldInfo<TEntity, TPropertyType>(this TEntity value, Expression<Func<TPropertyType>> expr)
+        public static ChangeTrackingInfo GetChangeTrackingInfo<TEntity, TPropertyType>(this TEntity value, Expression<Func<TPropertyType>> expr)
         {
             //var type = value.GetType();
 
@@ -26,7 +26,7 @@ namespace GrumpyDev.Net.DataTools.ChangeTracking
 
             //var attributes = fieldInfo.GetCustomAttributes(typeof(TrackedFieldAttribute), false) as TrackedFieldAttribute[];
 
-            //return attributes.Length > 0 ? attributes[0].TrackedFieldInfo : null;
+            //return attributes.Length > 0 ? attributes[0].ChangeTrackingInfo : null;
 
             //var props = typeof(TEntity).GetProperties();
             //foreach (PropertyInfo prop in props)
@@ -37,7 +37,7 @@ namespace GrumpyDev.Net.DataTools.ChangeTracking
             //        var authAttr = attr as TrackedFieldAttribute;
             //        if (authAttr != null)
             //        {
-            //            return authAttr.TrackedFieldInfo;
+            //            return authAttr.ChangeTrackingInfo;
             //        }
             //    }
             //}
@@ -47,7 +47,7 @@ namespace GrumpyDev.Net.DataTools.ChangeTracking
             if (mexpr.Member == null) return null;
 
 
-            return GetTrackedFieldInfo(value, mexpr.Member.Name);
+            return GetChangeTrackingInfo(value, mexpr.Member.Name);
 
 
 
@@ -58,14 +58,14 @@ namespace GrumpyDev.Net.DataTools.ChangeTracking
             //return desc.Description;
         }
 
-        public static TrackedFieldInfo GetTrackedFieldInfo<TEntity>(this TEntity value, string propertyName)
+        public static ChangeTrackingInfo GetChangeTrackingInfo<TEntity>(this TEntity value, string propertyName = "")
         {
 
             if (!TrackedPropertyDictionary.ContainsKey(value))
             {
-                var newpropertyDictionary = new Dictionary<string, TrackedFieldInfo>
+                var newpropertyDictionary = new Dictionary<string, ChangeTrackingInfo>
                 {
-                    {propertyName, new TrackedFieldInfo()}
+                    {propertyName, new ChangeTrackingInfo()}
                 };
 
                 TrackedPropertyDictionary.Add(value, newpropertyDictionary);
@@ -75,23 +75,11 @@ namespace GrumpyDev.Net.DataTools.ChangeTracking
 
             if (!propertyDictionary.ContainsKey(propertyName))
             {
-                propertyDictionary.Add(propertyName, new TrackedFieldInfo());
+                propertyDictionary.Add(propertyName, new ChangeTrackingInfo());
             }
 
             return propertyDictionary[propertyName];
 
-        }
-
-
-        public static TrackedEntityInfo GetTrackedEntityInfo<TEntity>(this TEntity value)
-        {
-            var type = value.GetType();
-
-            //var fieldInfo = type.GetProperty(value.ToString());
-
-            var attributes = type.GetCustomAttributes(typeof(TrackedEntityAttribute), false) as TrackedEntityAttribute[];
-
-            return attributes.Length > 0 ? attributes[0].TrackedEntityInfo : null;
         }
     }
 }

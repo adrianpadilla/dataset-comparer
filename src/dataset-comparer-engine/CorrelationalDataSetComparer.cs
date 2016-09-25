@@ -280,7 +280,7 @@ namespace GrumpyDev.Net.DataTools.DataSetComparer
 
                 var propertyInfo = newEntity.GetType().GetProperty(columnName);
 
-                var attributes = propertyInfo.GetCustomAttributes(typeof(TrackedFieldAttribute), false) as TrackedFieldAttribute[];
+                // var attributes = propertyInfo.GetCustomAttributes(typeof(TrackedFieldAttribute), false) as TrackedFieldAttribute[];
 
                 //var attribute =  attributes.Length > 0 ? attributes[0] : null;
 
@@ -291,15 +291,15 @@ namespace GrumpyDev.Net.DataTools.DataSetComparer
 
                     //TrackedFieldAttribute attribute = Attribute.GetCustomAttribute(propertyInfo, typeof(TrackedFieldAttribute)) as TrackedFieldAttribute;
                     
-                    //var changeTrackingInfo = new TrackedFieldInfo
+                    //var changeTrackingInfo = new ChangeTrackingInfo
                     //{
                     //    State = FieldChangeState.Modified,
                     //    OldValue = baseLineValue
                     //};
 
-                    //attribute.TrackedFieldInfo = changeTrackingInfo;
-                    var trackingInfo = newEntity.GetTrackedFieldInfo(columnName);
-                    trackingInfo.State = FieldChangeState.Modified;
+                    //attribute.ChangeTrackingInfo = changeTrackingInfo;
+                    var trackingInfo = newEntity.GetChangeTrackingInfo(columnName);
+                    trackingInfo.State = ChangeState.Modified;
                     trackingInfo.OldValue = baseLineValue;
 
                 }
@@ -347,7 +347,7 @@ namespace GrumpyDev.Net.DataTools.DataSetComparer
                 if (belowIsSame)
                 {
                     var changedEntity = GetEntity<TEntity>(differences.Rows[rowIndx], differences.Rows[rowIndx + 1]);
-                    changedEntity.GetTrackedEntityInfo().State = EntityChangeState.Modified;
+                    changedEntity.GetChangeTrackingInfo().State = ChangeState.Modified;
                     list.Add(changedEntity);
                 }   
             }

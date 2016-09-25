@@ -6,10 +6,14 @@ using System.Threading.Tasks;
 
 namespace GrumpyDev.Net.DataTools.ChangeTracking
 {
-    public enum FieldChangeState
+    public enum ChangeState
     {
         Unmodified,
 
-        Modified
+        New,
+
+        Modified,
+
+        Deleted
     }
 }
