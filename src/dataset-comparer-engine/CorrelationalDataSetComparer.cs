@@ -261,7 +261,38 @@ namespace GrumpyDev.Net.DataTools.DataSetComparer
             return ResultDataTable;
         }
 
-        public static TEntity GetEntity<TEntity>(DataRow baseline, DataRow changed) where TEntity : new()
+        public static TEntity GetEntity<TEntity>(DataRow baseline)
+            where TEntity : new()
+        {
+            var newEntity = new TEntity();
+
+
+            for (int i = 0; i < baseline.Table.Columns.Count; i++)
+            {
+                var columnName = baseline.Table.Columns[i].ColumnName.TrimEnd('\n').TrimEnd('\r');
+
+                if (columnName == "Comparison_Result")
+                {
+                    continue;
+                }
+
+                var baseLineValue = baseline[i].ToString();
+                
+                var propertyInfo = newEntity.GetType().GetProperty(columnName);
+
+                // var attributes = propertyInfo.GetCustomAttributes(typeof(TrackedFieldAttribute), false) as TrackedFieldAttribute[];
+
+                //var attribute =  attributes.Length > 0 ? attributes[0] : null;
+
+
+                propertyInfo.SetValue(newEntity, Convert.ChangeType(baseLineValue, propertyInfo.PropertyType), null);
+
+            }
+
+            return newEntity;
+        }
+
+        public static TEntity GetMergedEntityFromChanged<TEntity>(DataRow baseline, DataRow changed) where TEntity : new()
         {
             var newEntity =new TEntity();
             
@@ -346,10 +377,25 @@ namespace GrumpyDev.Net.DataTools.DataSetComparer
 
                 if (belowIsSame)
                 {
-                    var changedEntity = GetEntity<TEntity>(differences.Rows[rowIndx], differences.Rows[rowIndx + 1]);
+                    var changedEntity = GetMergedEntityFromChanged<TEntity>(differences.Rows[rowIndx], differences.Rows[rowIndx + 1]);
                     changedEntity.GetChangeTrackingInfo().State = ChangeState.Modified;
                     list.Add(changedEntity);
-                }   
+                    rowIndx++;
+                }
+                else
+                {
+                    var changedEntity = GetEntity<TEntity>(differences.Rows[rowIndx]);
+                    if (differences.Rows[rowIndx]["Comparison_Result"].Equals(StateValues.ElementInBaselineTable))
+                    {
+                        changedEntity.GetChangeTrackingInfo().State = ChangeState.New;
+                    }
+                    else
+                    {
+                        changedEntity.GetChangeTrackingInfo().State = ChangeState.Deleted;
+                    }
+                    
+                    list.Add(changedEntity);
+                }
             }
 
             return list.AsEnumerable();
@@ -365,24 +411,25 @@ namespace GrumpyDev.Net.DataTools.DataSetComparer
             }
             int[] ignoredColumnIndices = ignoredColumnIndexList.ToArray<int>();
 
+            #region Old headers
+            //sb.Append(String.Format("<h4>{0}</h4>", differences.TableName));
+            //sb.Append("Comparison&nbsp;criteria&#58;<br>");
+            //sb.AppendLine("Identifier&nbsp;Columns<br>");
+            //sb.AppendLine("<ul>");
+            //foreach (var item in identifierColumns)
+            //{
+            //    sb.Append(String.Format("<li>{0}</li>", item));
+            //}
+            //sb.AppendLine("</ul>");
+            //sb.AppendLine("Ignored&nbsp;Columns<br>");
+            //sb.AppendLine("<ul>");
 
-            sb.Append(String.Format("<h4>{0}</h4>", differences.TableName));
-            sb.Append("Comparison&nbsp;criteria&#58;<br>");
-            sb.AppendLine("Identifier&nbsp;Columns<br>");
-            sb.AppendLine("<ul>");
-            foreach (var item in identifierColumns)
-            {
-                sb.Append(String.Format("<li>{0}</li>", item));
-            }
-            sb.AppendLine("</ul>");
-            sb.AppendLine("Ignored&nbsp;Columns<br>");
-            sb.AppendLine("<ul>");
-
-            foreach (var item in ignoredColumns)
-            {
-                sb.Append(String.Format("<li>{0}</li>", item));
-            }
-            sb.AppendLine("</ul>");
+            //foreach (var item in ignoredColumns)
+            //{
+            //    sb.Append(String.Format("<li>{0}</li>", item));
+            //}
+            //sb.AppendLine("</ul>");
+            #endregion
 
             //generate table header row
             sb.AppendLine("<div class='comparisonresults'>");
